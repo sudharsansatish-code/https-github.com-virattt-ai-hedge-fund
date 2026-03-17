@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { API_BASE_URL, getAuthHeaders, getAuthOnlyHeaders } from '@/services/api-config';
 
 export interface ApiKey {
   id: number;
@@ -48,7 +48,9 @@ class ApiKeysService {
       params.append('include_inactive', 'true');
     }
     
-    const response = await fetch(`${this.baseUrl}?${params}`);
+    const response = await fetch(`${this.baseUrl}?${params}`, {
+      headers: getAuthOnlyHeaders(),
+    });
     if (!response.ok) {
       throw new Error(`Failed to fetch API keys: ${response.statusText}`);
     }
@@ -56,7 +58,9 @@ class ApiKeysService {
   }
 
   async getApiKey(provider: string): Promise<ApiKey> {
-    const response = await fetch(`${this.baseUrl}/${encodeURIComponent(provider)}`);
+    const response = await fetch(`${this.baseUrl}/${encodeURIComponent(provider)}`, {
+      headers: getAuthOnlyHeaders(),
+    });
     if (!response.ok) {
       if (response.status === 404) {
         throw new Error('API key not found');
@@ -69,9 +73,7 @@ class ApiKeysService {
   async createOrUpdateApiKey(request: ApiKeyCreateRequest): Promise<ApiKey> {
     const response = await fetch(this.baseUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(request),
     });
     
@@ -84,9 +86,7 @@ class ApiKeysService {
   async updateApiKey(provider: string, request: ApiKeyUpdateRequest): Promise<ApiKey> {
     const response = await fetch(`${this.baseUrl}/${encodeURIComponent(provider)}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(request),
     });
     
@@ -102,6 +102,7 @@ class ApiKeysService {
   async deleteApiKey(provider: string): Promise<void> {
     const response = await fetch(`${this.baseUrl}/${encodeURIComponent(provider)}`, {
       method: 'DELETE',
+      headers: getAuthOnlyHeaders(),
     });
     
     if (!response.ok) {
@@ -115,6 +116,7 @@ class ApiKeysService {
   async deactivateApiKey(provider: string): Promise<ApiKeySummary> {
     const response = await fetch(`${this.baseUrl}/${encodeURIComponent(provider)}/deactivate`, {
       method: 'PATCH',
+      headers: getAuthOnlyHeaders(),
     });
     
     if (!response.ok) {
@@ -129,9 +131,7 @@ class ApiKeysService {
   async bulkUpdateApiKeys(request: ApiKeyBulkUpdateRequest): Promise<ApiKey[]> {
     const response = await fetch(`${this.baseUrl}/bulk`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(request),
     });
     
@@ -144,6 +144,7 @@ class ApiKeysService {
   async updateLastUsed(provider: string): Promise<void> {
     const response = await fetch(`${this.baseUrl}/${encodeURIComponent(provider)}/last-used`, {
       method: 'PATCH',
+      headers: getAuthOnlyHeaders(),
     });
     
     if (!response.ok) {

@@ -3,11 +3,10 @@ import { Agent } from '@/data/agents';
 import { LanguageModel } from '@/data/models';
 import { extractBaseAgentKey } from '@/data/node-mappings';
 import { flowConnectionManager } from '@/hooks/use-flow-connection';
+import { API_BASE_URL, getAuthHeaders, getAuthOnlyHeaders } from '@/services/api-config';
 import {
   HedgeFundRequest
 } from '@/services/types';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const api = {
   /**
@@ -16,7 +15,9 @@ export const api = {
    */
   getAgents: async (): Promise<Agent[]> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/hedge-fund/agents`);
+      const response = await fetch(`${API_BASE_URL}/hedge-fund/agents`, {
+        headers: getAuthOnlyHeaders(),
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -34,7 +35,9 @@ export const api = {
    */
   getLanguageModels: async (): Promise<LanguageModel[]> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/language-models/`);
+      const response = await fetch(`${API_BASE_URL}/language-models/`, {
+        headers: getAuthOnlyHeaders(),
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -56,9 +59,7 @@ export const api = {
     try {
       const response = await fetch(`${API_BASE_URL}/storage/save-json`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           filename,
           data
@@ -108,9 +109,7 @@ export const api = {
     // Make a POST request with the JSON body
     fetch(`${API_BASE_URL}/hedge-fund/run`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(backendParams),
       signal,
     })

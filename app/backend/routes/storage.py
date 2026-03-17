@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 import json
+import os
 from pathlib import Path
 from pydantic import BaseModel
 
@@ -23,9 +24,10 @@ async def save_json_file(request: SaveJsonRequest):
     """Save JSON data to the project's /outputs directory."""
     try:
         # Create outputs directory if it doesn't exist
+        # Allow overriding via env var for production (persistent disk)
         project_root = Path(__file__).parent.parent.parent.parent  # Navigate to project root
-        outputs_dir = project_root / "outputs"
-        outputs_dir.mkdir(exist_ok=True)
+        outputs_dir = Path(os.getenv("STORAGE_PATH", str(project_root / "outputs")))
+        outputs_dir.mkdir(parents=True, exist_ok=True)
         
         # Construct file path
         file_path = outputs_dir / request.filename

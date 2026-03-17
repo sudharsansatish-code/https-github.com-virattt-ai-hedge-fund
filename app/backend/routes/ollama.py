@@ -184,8 +184,6 @@ async def download_model_with_progress(request: ModelRequest):
             headers={
                 "Cache-Control": "no-cache",
                 "Connection": "keep-alive",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "*",
             }
         )
     except HTTPException:

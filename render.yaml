@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: ai-hedge-fund-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: API_AUTH_TOKEN
+        generateValue: true
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: FINANCIAL_DATASETS_API_KEY
+        sync: false
+      - key: DATABASE_PATH
+        value: /app/data/hedge_fund.db
+      - key: STORAGE_PATH
+        value: /app/data/outputs
+    disk:
+      name: data
+      mountPath: /app/data
+      sizeGB: 1
