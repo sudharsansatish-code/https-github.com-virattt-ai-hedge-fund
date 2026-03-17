@@ -33,6 +33,5 @@ RUN mkdir -p /app/data /app/config
 ENV PORT=8000
 EXPOSE ${PORT}
 
-# Production command: $PORT for Render, 2 workers, keep-alive > Render's 60s default,
-# graceful shutdown to allow in-flight SSE streams to finish on redeploy
-CMD ["sh", "-c", "python -m uvicorn app.backend.main:app --host 0.0.0.0 --port ${PORT} --workers 2 --timeout-keep-alive 65 --graceful-timeout 30"]
+# Production command: $PORT for Render, keep-alive > Render's 60s default
+CMD ["sh", "-c", "python -m uvicorn app.backend.main:app --host 0.0.0.0 --port ${PORT} --timeout-keep-alive 65"]
